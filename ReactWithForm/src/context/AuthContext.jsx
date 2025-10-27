@@ -7,6 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(() => localStorage.getItem('token') || null);
     const [user, setUser] = useState(null);
+    const [ready, setReady] = useState(false);
     const navigate = useNavigate();
     const saveToken = (newToken) => {
         if (newToken) {
@@ -15,10 +16,8 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Al montar, aceptar token desde fragment o query string (p.ej. redirect OAuth)
     useEffect(() => {
         try {
-        // primero mirar fragment (#token=...)
         if (typeof window !== 'undefined') {
             const hash = window.location.hash || '';
             let t = null;
@@ -27,7 +26,6 @@ export const AuthProvider = ({ children }) => {
             t = hashParams.get('token');
             }
 
-            // si no hay en fragment, mirar query string para compatibilidad
             if (!t) {
             const qp = new URLSearchParams(window.location.search);
             t = qp.get('token');
@@ -35,7 +33,6 @@ export const AuthProvider = ({ children }) => {
 
             if (t) {
             saveToken(t);
-            // limpiar fragment y query string
             const cleanUrl = window.location.pathname + window.location.search.replace(/\?token=[^&]*/, '').replace(/\?$/, '') + window.location.hash.replace(/#token=[^&]*/, '');
             window.history.replaceState({}, document.title, cleanUrl);
             }
@@ -43,7 +40,9 @@ export const AuthProvider = ({ children }) => {
         } catch {
         // ignore
         }
+    
     }, []);
+
 
     useEffect(() => {
         if (token) {
@@ -61,6 +60,8 @@ export const AuthProvider = ({ children }) => {
         } else {
         setUser(null);
         }
+        // inicialización completa
+        setReady(true);
     }, [token]);
 
     const register = async (data) => {
@@ -101,7 +102,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ token, user, register, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ token, user, register, login, logout, isAuthenticated, ready }}>
         {children}
         </AuthContext.Provider>
     );
