@@ -1,0 +1,41 @@
+.register-container {
+    display: flex;
+    justify-content: center;
+    padding: 12px 16px; /* espacio alrededor en mobile */
+}
+
+.register-box {
+    width: 100%;
+    max-width: 520px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.register-box form {
+  margin: 0;
+}
+
+.register-google-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.google-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: #ececec;
+    color: #000;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 30px;
+}
+
+.google-btn:hover {
+    opacity: 0.95;
+}
+
+@media (min-width: 720px) {
+    .register-box { padding: 12px 20px; }
+}

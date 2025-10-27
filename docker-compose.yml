@@ -1,0 +1,52 @@
+services:
+  express:
+    build:
+      context: ./Express-server
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://toledo:123@mongo:27017/Practica4?authSource=admin
+      # Google OAuth (defínelas en .env o en el entorno del host)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+    volumes:
+      - ./Express-server:/app
+      - /app/node_modules
+    command: sh -c "npm install && nodemon server.js"
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6
+    container_name: mongodb_practica
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: toledo
+      MONGO_INITDB_ROOT_PASSWORD: "123"
+      MONGO_INITDB_DATABASE: Practica4
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  react:
+    build:
+      context: ./ReactWithForm
+      dockerfile: dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./ReactWithForm:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - express
+
+volumes:
+  mongo-data:
